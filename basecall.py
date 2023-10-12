@@ -3,7 +3,7 @@ import os
 import sys
 import time
 import numpy as np
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
 import model
 from data_input import read_data_for_eval
 import easy_assembler
@@ -260,7 +260,7 @@ def call():
 
             pbars.update(0,progress = f_i+1)
             pbars.update_bar()
-            qs_list = np.empty((0, 1), dtype=np.float)
+            qs_list = np.empty((0, 1), dtype=float) #np.float)
             qs_string = None
             mean_qs = 0
             for i in range(0, reads_n, FLAGS.batch_size):
@@ -396,6 +396,7 @@ if __name__ == "__main__":
     extract(FLAGS)
     FLAGS.input = FLAGS.output + os.sep + 'raw' + os.sep
     print("start basecalling")
+    tf.disable_eager_execution()
     time_dict = time_os(call)
     print("basecall completed!")
     meta_folder = os.path.join(FLAGS.output, 'meta')

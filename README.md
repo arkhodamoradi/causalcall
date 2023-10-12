@@ -1,3 +1,10 @@
+# This fork
+This is an attempt to run the Causalcall with the following environment:
+- Ubuntu 20.04 
+- python 3.8.10
+- tensorflow 2.13.1
+- numpy 1.24.3
+
 # Causalcall
 Code for the paper *Causalcall: nanopore basecalling using a temporal convolutional network*.
 

@@ -181,7 +181,7 @@ class DataSet(object):
         event = np.asarray(
             list(
                 zip([self._event[i] for i in index],
-                    [self._event_length[i] for i in index])))
+                    [self._event_length[i] for i in index])), dtype="object")
         if not self.for_eval:
             label = np.asarray(
                 list(
@@ -546,9 +546,9 @@ def read_signal(file_path, normalize="median"):
     if len(signal) == 0:
         return signal.tolist()
     if normalize == "mean":
-        signal = (signal - np.mean(signal)) / np.float(np.std(signal))
+        signal = (signal - np.mean(signal)) / np.float32(np.std(signal))
     elif normalize == "median":
-        signal = (signal - np.median(signal)) / np.float(robust.mad(signal))
+        signal = (signal - np.median(signal)) / np.float32(robust.mad(signal))
     return signal.tolist()
 
 
@@ -558,9 +558,9 @@ def read_signal_tfrecord(data_array, normalize="median"):
     if len(signal) == 0:
         return signal.tolist()
     if normalize == "mean":
-        signal = (signal - np.mean(signal)) / np.float(np.std(signal))
+        signal = (signal - np.mean(signal)) / np.float32(np.std(signal))
     elif normalize == "median":
-        signal = (signal - np.median(signal)) / np.float(robust.mad(signal))
+        signal = (signal - np.median(signal)) / np.float32(robust.mad(signal))
     return signal.tolist()
 
 

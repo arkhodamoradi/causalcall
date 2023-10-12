@@ -1,4 +1,4 @@
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
 import math
 
 
@@ -222,7 +222,8 @@ def TemporalConvNet(inputs,
     with tf.variable_scope("FC"):
         input_shape = input_layer.get_shape().as_list()
         # print('input layer shape : ',input_shape)
-        tempconvout1 = tf.layers.dense(input_layer, input_shape[-1] / 2, kernel_initializer=tf.contrib.layers.xavier_initializer(),name='FC1')   
+        #tempconvout1 = tf.layers.dense(input_layer, input_shape[-1] / 2, kernel_initializer=tf.contrib.layers.xavier_initializer(),name='FC1')   
+        tempconvout1 = tf.layers.dense(input_layer, input_shape[-1] / 2, kernel_initializer=tf.keras.initializers.glorot_normal(),name='FC1')   
         tempconvout1 = tf.nn.leaky_relu(tempconvout1, 0.01)
         input_shape = tempconvout1.get_shape().as_list()
         # print('after f1 shape : ',input_shape) 
@@ -231,7 +232,7 @@ def TemporalConvNet(inputs,
         Wh = tf.get_variable(
             "logit_weights",
             shape=[full_input_chan, num_channels[-1]],
-            initializer=tf.contrib.layers.xavier_initializer())
+            initializer=tf.keras.initializers.glorot_normal()) #tf.contrib.layers.xavier_initializer())
         ba = tf.get_variable(
             "logit_bias",
             shape=[num_channels[-1]],
