@@ -12,6 +12,7 @@ import logging
 from tqdm import tqdm
 from multiprocessing import Pool
 from multiprocessing import cpu_count
+from ont_fast5_api.fast5_interface import get_fast5_file
 logger = logging.getLogger(name='basecall_log')
 
 
@@ -75,6 +76,47 @@ def extract_file_wrapper(args):
     file_n = os.path.basename(full_file_n)
     if full_file_n.endswith('fast5'):
         try:
+            raw_signals, reference = extract_file(full_file_n,FLAGS.mode)
+            if raw_signals is None:
+                raise ValueError("Fail in extracting raw signal.")
+            if len(raw_signals) == 0:
+                raise ValueError("Got empty raw signal")
+        except Exception as e:
+            logger.error("Cannot extract file %s. %s"%(full_file_n,e))
+            return
+        for raw_signald in raw_signals:
+            signal_id = raw_signald[0]
+            raw_signal = raw_signald[1]
+            with open(os.path.join(FLAGS.raw_folder, os.path.splitext(file_n)[0] + '_' + signal_id + '.signal'), 'w+') as signal_file:
+                signal_file.write(" ".join([str(val) for val in raw_signal]))
+    return
+
+def extract_file(input_file,mode = 'dna'):
+    global logger 
+    try:
+        input_data = get_fast5_file(input_file, 'r')
+    except IOError as e:
+        logger.error(e)
+        raise IOError(e)
+    except Exception as e:
+        logger.error(e)
+        raise Exception(e)
+    
+    all_ids = input_data.get_read_ids()
+    raw_signals = []
+    for _id in all_ids:
+        _read = input_data.get_read(_id)
+        raw_signals.append([_id, _read.get_raw_data()])
+
+    reference = ''
+    return raw_signals, reference
+
+def extract_file_wrapper_org(args):
+    global logger
+    full_file_n, FLAGS = args
+    file_n = os.path.basename(full_file_n)
+    if full_file_n.endswith('fast5'):
+        try:
             raw_signal, reference = extract_file(full_file_n,FLAGS.mode)
             if raw_signal is None:
                 raise ValueError("Fail in extracting raw signal.")
@@ -87,7 +129,7 @@ def extract_file_wrapper(args):
             signal_file.write(" ".join([str(val) for val in raw_signal]))
     return
 
-def extract_file(input_file,mode = 'dna'):
+def extract_file_org(input_file,mode = 'dna'):
     global logger 
     try:
         input_data = h5py.File(input_file, 'r')
